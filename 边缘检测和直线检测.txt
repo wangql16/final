@@ -1,0 +1,180 @@
+%读取图像，图像4为索引图像，需要转为2值图像，其余均为灰度图像
+I1=imread('test1.bmp');
+I2=imread('test2.png');
+I3=imread('test3.jpg');
+[X,map]=imread('test4.bmp');
+I4=ind2gray(X,map);
+I5=imread('test5.png');
+I6=imread('test6.jpg');
+figure(1);detect(I1);
+figure(2);detect(I2);
+figure(3);detect(I3);
+figure(4);detect(I4);
+figure(5);detect(I5);
+figure(6);detect(I6);
+
+
+检测函数
+
+function [ S_I,C_I ] = detect(I)
+%   灰度图像I边缘检测及相应直线检测结果，边缘检测采用sobel和canny两种，直线检测采用 哈夫
+%   此处显示详细说明
+subplot(131);imshow(I);title('原图')
+[S_I,threshs]=edge(I,'sobel');
+subplot(232);imshow(S_I);title('Sobel边缘检测');
+%得到霍夫空间 
+[H1,T1,R1] = hough(S_I,'Theta',-89.9:0.1:89.9); 
+%求极值点
+Peaks1=houghpeaks(H1,20); 
+%得到线段信息 
+lines1=houghlines(S_I,T1,R1,Peaks1);
+subplot(233);
+imshow(S_I);title('哈夫直线检测'); hold on
+%绘制线段 
+for k=1:length(lines1) 
+ xy=[lines1(k).point1;
+ lines1(k).point2]; 
+ plot(xy(:,1),xy(:,2),'blue','LineWidth',0.5); 
+end 
+%canny中设弱边缘阈值TL和另外两个边缘检测阈值相同，强边缘阈值TH为弱边缘阈值2.5倍
+C_I=edge(I,'canny',[threshs,2.5*threshs]);
+subplot(235);imshow(C_I);title('Canny算子');
+%得到霍夫空间 
+[H2,T2,R2] = hough(C_I,'Theta',-89.9:0.1:89.9); 
+%求极值点
+Peaks2=houghpeaks(H2,20); 
+%得到线段信息 
+lines2=houghlines(C_I,T2,R2,Peaks2);
+subplot(236);imshow(C_I);title('哈夫直线检测'); hold on
+%绘制线段 
+for k=1:length(lines2) 
+ xy=[lines2(k).point1;
+ lines2(k).point2]; 
+ plot(xy(:,1),xy(:,2),'blue','LineWidth',0.5); 
+end 
+
+
+
+参数调整
+[X,map]=imread('test4.bmp');
+I=ind2gray(X,map);
+I1=imread('test3.jpg');
+figure(1)
+suptitle('角度参数：-89.9:0.01:89.9')
+%subplot(231);imshow(I);title('原图')
+%设弱边缘阈值TL和另外两个边缘检测阈值相同，强边缘阈值TH为弱边缘阈值2.5倍
+C_I=edge(I,'canny');subplot(221);imshow(C_I);title('Canny算子');
+%得到霍夫空间 
+[H2,T2,R2] = hough(C_I,'Theta',-89.9:0.1:89.9); 
+subplot(212);
+       imshow(imadjust(mat2gray(H2)),'XData',T2,'YData',R2,...
+              'InitialMagnification','fit');
+       title('Limited theta range Hough transform of gantrycrane.png');
+       xlabel('\theta'), ylabel('\rho');
+       axis on, axis normal;
+%求极值点
+Peaks2=houghpeaks(H2,20); 
+hold;
+for i=1:size(Peaks2,1)
+   plot(T2(Peaks2(i,2)),R2(Peaks2(i,1)),'ro','LineWidth',1.5); 
+end
+%得到线段信息 
+lines2=houghlines(C_I,T2,R2,Peaks2);
+subplot(222);
+imshow(C_I);title('哈夫直线检测'); hold on
+%绘制线段 
+for k=1:length(lines2) 
+ xy=[lines2(k).point1;
+ lines2(k).point2]; 
+ plot(xy(:,1),xy(:,2),'blue','LineWidth',0.5); 
+end 
+
+figure(2)
+suptitle('角度参数：-20:0.1:20')
+%subplot(231);imshow(I);title('原图')
+%设弱边缘阈值TL和另外两个边缘检测阈值相同，强边缘阈值TH为弱边缘阈值2.5倍
+C_I=edge(I1,'canny');subplot(221);imshow(C_I);title('Canny算子');
+%得到霍夫空间 
+[H2,T2,R2] = hough(C_I,'Theta',-20:0.1:20); 
+subplot(212);
+       imshow(imadjust(mat2gray(H2)),'XData',T2,'YData',R2,...
+              'InitialMagnification','fit');
+       title('Limited theta range Hough transform of gantrycrane.png');
+       xlabel('\theta'), ylabel('\rho');
+       axis on, axis normal;
+%求极值点
+Peaks2=houghpeaks(H2,20); 
+hold;
+for i=1:size(Peaks2,1)
+   plot(T2(Peaks2(i,2)),R2(Peaks2(i,1)),'ro','LineWidth',1.5); 
+end
+%得到线段信息 
+lines2=houghlines(C_I,T2,R2,Peaks2);
+subplot(222);
+imshow(C_I);title('哈夫直线检测'); hold on
+%绘制线段 
+for k=1:length(lines2) 
+ xy=[lines2(k).point1;
+ lines2(k).point2]; 
+ plot(xy(:,1),xy(:,2),'blue','LineWidth',0.5); 
+end 
+
+figure(3)
+suptitle('角度参数：-89:0.1:89')
+%subplot(231);imshow(I);title('原图')
+%设弱边缘阈值TL和另外两个边缘检测阈值相同，强边缘阈值TH为弱边缘阈值2.5倍
+C_I=edge(I,'canny');subplot(221);imshow(C_I);title('Canny算子');
+%得到霍夫空间 
+[H2,T2,R2] = hough(C_I,'Theta',-89:0.1:89); 
+subplot(212);
+       imshow(imadjust(mat2gray(H2)),'XData',T2,'YData',R2,...
+              'InitialMagnification','fit');
+       title('Limited theta range Hough transform of gantrycrane.png');
+       xlabel('\theta'), ylabel('\rho');
+       axis on, axis normal;
+%求极值点
+Peaks2=houghpeaks(H2,20); 
+hold;
+for i=1:size(Peaks2,1)
+   plot(T2(Peaks2(i,2)),R2(Peaks2(i,1)),'ro','LineWidth',1.5); 
+end
+%得到线段信息 
+lines2=houghlines(C_I,T2,R2,Peaks2);
+subplot(222);
+imshow(C_I);title('哈夫直线检测'); hold on
+%绘制线段 
+for k=1:length(lines2) 
+ xy=[lines2(k).point1;
+ lines2(k).point2]; 
+ plot(xy(:,1),xy(:,2),'blue','LineWidth',0.5); 
+end 
+
+figure(4)
+suptitle('角度参数：-89.9:10:89.9')
+%subplot(231);imshow(I);title('原图')
+%设弱边缘阈值TL和另外两个边缘检测阈值相同，强边缘阈值TH为弱边缘阈值2.5倍
+C_I=edge(I1,'canny');subplot(221);imshow(C_I);title('Canny算子');
+%得到霍夫空间 
+[H2,T2,R2] = hough(C_I,'Theta',-89.9:10:89.9); 
+subplot(212);
+       imshow(imadjust(mat2gray(H2)),'XData',T2,'YData',R2,...
+              'InitialMagnification','fit');
+       title('Limited theta range Hough transform of gantrycrane.png');
+       xlabel('\theta'), ylabel('\rho');
+       axis on, axis normal;
+%求极值点
+Peaks2=houghpeaks(H2,20); 
+hold;
+for i=1:size(Peaks2,1)
+   plot(T2(Peaks2(i,2)),R2(Peaks2(i,1)),'ro','LineWidth',1.5); 
+end
+%得到线段信息 
+lines2=houghlines(C_I,T2,R2,Peaks2);
+subplot(222);
+imshow(C_I);title('哈夫直线检测'); hold on
+%绘制线段 
+for k=1:length(lines2) 
+ xy=[lines2(k).point1;
+ lines2(k).point2]; 
+ plot(xy(:,1),xy(:,2),'blue','LineWidth',0.5); 
+end 
